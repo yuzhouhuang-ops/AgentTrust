@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-10-14T04:11:07.710606+00:00",
+  "config": {
+    "rounds_per_trial": 100,
+    "seed": 42,
+    "trials": 5,
+    "required_capabilities": [
+      "research"
+    ],
+    "early_phase_rounds": 20,
+    "scoring_weights": {
+      "capability": 0.6,
+      "trust": 0.3,
+      "latency": 0.1
+    }
+  },
+  "agent_profiles": [
+    {
+      "name": "Reliable-Researcher",
+      "capabilities": [
+        "research"
+      ],
+      "claimed_success_rate": 0.82,
+      "true_success_rate": 0.82,
+      "latency_ms": 430,
+      "is_deceptive": false,
+      "overclaim_gap": 0.0,
+      "note": "可靠型：能力窄但表现扎实"
+    },
+    {
+      "name": "Fast-Generalist",
+      "capabilities": [
+        "research",
+        "summarization"
+      ],
+      "claimed_success_rate": 0.75,
+      "true_success_rate": 0.75,
+      "latency_ms": 180,
+      "is_deceptive": false,
+      "overclaim_gap": 0.0,
+      "note": "快速通用型：能力强、速度快，但可靠性中等"
+    },
+    {
+      "name": "Claimed-Expert",
+      "capabilities": [
+        "research",
+        "translation",
+        "coding"
+      ],
+      "claimed_success_rate": 0.99,
+      "true_success_rate": 0.15,
+      "latency_ms": 150,
+      "is_deceptive": true,
+      "overclaim_gap": 0.84,
+      "note": "虚报型：宣称 0.99 实际 0.15，且延迟最低最容易骗过排序"
+    }
+  ],
+  "metrics_summary": {
+    "random": {
+      "task_success_rate": 0.584,
+      "deceptive_selection_rate": 0.292,
+      "early_deceptive_rate": 0.29,
+      "late_deceptive_rate": 0.2925,
+      "never_selected_deceptive": false,
+      "recovery_round": 100,
+      "avg_latency_ms": 259.829,
+      "selections_per_agent": {
+        "Claimed-Expert": 146,
+        "Fast-Generalist": 181,
+        "Reliable-Researcher": 173
+      },
+      "success_rate_per_agent": {
+        "Claimed-Expert": 0.171233,
+        "Reliable-Researcher": 0.728324,
+        "Fast-Generalist": 0.779006
+      }
+    },
+    "capability_only": {
+      "task_success_rate": 0.162,
+      "deceptive_selection_rate": 1.0,
+      "early_deceptive_rate": 1.0,
+      "late_deceptive_rate": 1.0,
+      "never_selected_deceptive": false,
+      "recovery_round": 100,
+      "avg_latency_ms": 149.981,
+      "selections_per_agent": {
+        "Claimed-Expert": 500
+      },
+      "success_rate_per_agent": {
+        "Claimed-Expert": 0.162
+      }
+    },
+    "trust_aware": {
+      "task_success_rate": 0.784,
+      "deceptive_selection_rate": 0.012,
+      "early_deceptive_rate": 0.06,
+      "late_deceptive_rate": 0.0,
+      "never_selected_deceptive": false,
+      "recovery_round": 4,
+      "avg_latency_ms": 324.443,
+      "selections_per_agent": {
+        "Claimed-Expert": 6,
+        "Fast-Generalist": 199,
+        "Reliable-Researcher": 295
+      },
+      "success_rate_per_agent": {
+        "Claimed-Expert": 0.0,
+        "Fast-Generalist": 0.713568,
+        "Reliable-Researcher": 0.847458
+      }
+    }
+  },
+  "limitations": [
+    "智能体的成功率和延迟是人为设定的演示参数，不是真实系统测量值。",
+    "实验使用单项能力需求（research），三个智能体能力完全匹配，因此能力匹配度恒为 1.0，本实验无法体现能力匹配项的作用。",
+    "可信度公式为拉普拉斯平滑，属于基础做法，尚未与更复杂算法做对比。",
+    "冷启动阶段缺乏历史数据，所有策略都可能先被虚报型智能体误导。"
+  ]
+}

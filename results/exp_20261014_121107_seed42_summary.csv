@@ -1,0 +1,4 @@
+﻿strategy,total_rounds,success_count,failure_count,task_success_rate,deceptive_selection_count,deceptive_selection_rate,early_deceptive_rate,late_deceptive_rate,never_selected_deceptive,recovery_round,abstention_count,avg_latency_ms,latency_std
+capability_only,500,81,419,0.162,500,1.0,1.0,1.0,False,100,0,149.981,17.706
+random,500,292,208,0.584,146,0.292,0.29,0.2925,False,100,0,259.829,132.828
+trust_aware,500,392,108,0.784,6,0.012,0.06,0.0,False,4,0,324.443,128.383

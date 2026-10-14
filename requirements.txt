@@ -1,0 +1,16 @@
+# AgentTrust 依赖清单
+# 安装：python -m pip install -r requirements.txt
+#
+# 注意：文件必须是"一行一个包"。之前这个文件里写的是字面的 \n 字符而不是真换行，
+# 导致 pip 把三个包名当成一个包来解析，直接报 Invalid requirement 装不上。
+
+# --- 运行服务必需的三个包 ---
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+pydantic>=2.7,<3.0
+
+# --- 测试用（不装也能跑服务，但跑不了 pytest）---
+pytest>=8.0
+# FastAPI 的 TestClient 依赖它。缺少时报错：
+# "The starlette.testclient module requires the httpx2 package to be installed."
+httpx2>=2.0

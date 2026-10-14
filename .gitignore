@@ -1,0 +1,41 @@
+# ---- Python 虚拟环境（队友各自本地创建，绝对不要提交）----
+# 里面是第三方库文件，几千个，提交上去既慢又没意义
+.venv/
+venv/
+env/
+
+# ---- Python 编译缓存 ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---- 测试与工具缓存 ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---- 编辑器 / 系统文件 ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- 机密信息（绝对不能提交）----
+.env
+.env.*
+!.env.example
+
+# ---- 关于实验结果的重要说明 ----
+# results/ 里的实验数据**故意保留提交**，因为：
+#   1. 参赛要求保存原始实验结果
+#   2. 队友和评委需要能核对数据
+#   3. meta.json 里记了随机种子，可复现
+# 如果你不想把每次跑的中间结果都提交，可以只保留最新那一份，
+# 旧的手动删掉即可。不要用 .gitignore 整体排除 results/。

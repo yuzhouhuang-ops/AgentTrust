@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+# 只到 tests/ 目录里找测试，避免误扫 .venv 里的第三方测试
+testpaths = ["tests"]
+# -v 显示每个测试的名字，方便初学者看到"哪个测试在测什么"
+addopts = "-v --tb=short"
