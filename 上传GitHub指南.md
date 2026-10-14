@@ -316,13 +316,28 @@ git push
 | push 推送 | ✅ **完成，本地与远程完全一致** |
 | 端到端验证：模拟队友 clone → 装依赖 → 跑测试 | ✅ **204 passed** |
 
-**仓库地址**：https://github.com/yuzhouhuang-ops/AgentTurst
+**仓库地址**：https://github.com/yuzhouhuang-ops/AgentTrust
 
-> **注意仓库名的拼写**：是 `AgentTurst`，不是 `AgentTrust`（`u` 和 `r` 反了）。
-> 想改的话在仓库 `Settings` 页面改，改完记得本地也要同步：
-> ```powershell
-> git remote set-url origin https://github.com/yuzhouhuang-ops/新名字.git
-> ```
+> 项目已经成功上传，并做过端到端验证：模拟队友从零 clone → 建虚拟环境 →
+> 装依赖 → 跑测试，结果为 `204 passed`。
+
+### 改名记录（已解决）
+
+仓库最初建成了 `AgentTurst`（`u` 和 `r` 写反了），后来已改名为正确的 `AgentTrust`。
+
+**改名后要做两件事：**
+
+1. **GitHub 上要真的点 `Rename` 按钮** —— 只在输入框里改名字、不点按钮是不会生效的。
+   判断是否成功：浏览器地址栏和页面顶部仓库名会立刻变化。
+2. **本地远程地址要同步**：
+   ```powershell
+   git remote set-url origin https://github.com/yuzhouhuang-ops/AgentTrust.git
+   git remote -v      # 确认已改
+   git push           # 验证连通
+   ```
+
+**旧地址 `AgentTurst` 会自动跳转到新地址** —— 这是 GitHub 的保留机制，
+不是"改名失败"。判断改名是否成功的可靠方法是**看新地址能不能打开**。
 
 ---
 
