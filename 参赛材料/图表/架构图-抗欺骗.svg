@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="520" viewBox="0 0 1000 520" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"/></marker><marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1f6feb"/></marker></defs>
+<rect width="1000" height="520" fill="#ffffff"/>
+<text x="40" y="42" font-size="22" font-weight="700" fill="#1a1a1a" text-anchor="start" opacity="1.0">抗欺骗机制：四道防线</text>
+<text x="40" y="66" font-size="13" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">以虚报型智能体 Claimed-Expert（自称 99%，实际 1 胜 7 负）为例</text>
+<rect x="40" y="100" width="250" height="200" rx="10" fill="#fdeceb" stroke="#f85149" stroke-width="2"/>
+<text x="165" y="130" font-size="16" font-weight="700" fill="#f85149" text-anchor="middle" opacity="1.0">虚报型智能体</text>
+<text x="165" y="152" font-size="13" font-weight="400" fill="#6b7280" text-anchor="middle" opacity="1.0">Claimed-Expert</text>
+<text x="60" y="186" font-size="12.5" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">自称成功率</text>
+<text x="270" y="186" font-size="12.5" font-weight="700" fill="#f85149" text-anchor="end" opacity="1.0">99%</text>
+<text x="60" y="214" font-size="12.5" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">真实成功率</text>
+<text x="270" y="214" font-size="12.5" font-weight="700" fill="#f85149" text-anchor="end" opacity="1.0">15%</text>
+<text x="60" y="242" font-size="12.5" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">延迟</text>
+<text x="270" y="242" font-size="12.5" font-weight="700" fill="#6b7280" text-anchor="end" opacity="1.0">150ms（最低）</text>
+<text x="60" y="270" font-size="12.5" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">能力</text>
+<text x="270" y="270" font-size="12.5" font-weight="700" fill="#6b7280" text-anchor="end" opacity="1.0">3 项（最广）</text>
+<rect x="360" y="100" width="600" height="200" rx="10" fill="#ffffff" stroke="#9ca3af" stroke-width="1.5"/>
+<text x="380" y="130" font-size="16" font-weight="700" fill="#1a1a1a" text-anchor="start" opacity="1.0">系统如何处理这些信息</text>
+<text x="385" y="162" font-size="14" font-weight="400" fill="#f85149" text-anchor="middle" opacity="1.0">❌</text>
+<text x="412" y="162" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="start" opacity="1.0">不使用自我宣称值</text>
+<text x="412" y="178" font-size="11" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">可信度函数的参数列表中不含「宣称成功率」—— 结构上无从影响</text>
+<line x1="380" y1="186" x2="940" y2="186" stroke="#e5e7eb" stroke-width="1"/>
+<text x="385" y="196" font-size="14" font-weight="400" fill="#238636" text-anchor="middle" opacity="1.0">✅</text>
+<text x="412" y="196" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="start" opacity="1.0">用真实战绩计算可信度</text>
+<text x="412" y="212" font-size="11" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">(1 胜 7 负) → (1+2)÷(1+7+4) = 0.250</text>
+<line x1="380" y1="220" x2="940" y2="220" stroke="#e5e7eb" stroke-width="1"/>
+<text x="385" y="230" font-size="14" font-weight="400" fill="#238636" text-anchor="middle" opacity="1.0">✅</text>
+<text x="412" y="230" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="start" opacity="1.0">延迟分虽高但权重仅 10%</text>
+<text x="412" y="246" font-size="11" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">延迟分 0.870，贡献 0.087 —— 不足以翻盘</text>
+<line x1="380" y1="254" x2="940" y2="254" stroke="#e5e7eb" stroke-width="1"/>
+<text x="385" y="264" font-size="14" font-weight="400" fill="#238636" text-anchor="middle" opacity="1.0">✅</text>
+<text x="412" y="264" font-size="13" font-weight="700" fill="#1a1a1a" text-anchor="start" opacity="1.0">每次任务后更新战绩</text>
+<text x="412" y="280" font-size="11" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">越骗，可信度越低 —— 反馈闭环自动修正</text>
+<line x1="380" y1="288" x2="940" y2="288" stroke="#e5e7eb" stroke-width="1"/>
+<rect x="40" y="320" width="920" height="172" rx="10" fill="#eaf2ff" stroke="#1f6feb" stroke-width="2"/>
+<text x="60" y="352" font-size="17" font-weight="700" fill="#1f6feb" text-anchor="start" opacity="1.0">结果：综合分 0.762，在三个候选中排名最后</text>
+<text x="80" y="378" font-size="12" font-weight="700" fill="#6b7280" text-anchor="start" opacity="1.0">智能体</text>
+<text x="380" y="378" font-size="12" font-weight="700" fill="#6b7280" text-anchor="start" opacity="1.0">能力×0.60</text>
+<text x="520" y="378" font-size="12" font-weight="700" fill="#6b7280" text-anchor="start" opacity="1.0">可信度×0.30</text>
+<text x="660" y="378" font-size="12" font-weight="700" fill="#6b7280" text-anchor="start" opacity="1.0">延迟×0.10</text>
+<text x="810" y="378" font-size="12" font-weight="700" fill="#6b7280" text-anchor="start" opacity="1.0">综合分</text>
+<text x="80" y="402" font-size="12" font-weight="400" fill="#1a1a1a" text-anchor="start" opacity="1.0">Reliable-Researcher</text>
+<text x="380" y="402" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.600</text>
+<text x="520" y="402" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.214</text>
+<text x="660" y="402" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.070</text>
+<text x="810" y="402" font-size="12" font-weight="700" fill="#238636" text-anchor="start" opacity="1.0">0.884</text>
+<text x="80" y="424" font-size="12" font-weight="400" fill="#1a1a1a" text-anchor="start" opacity="1.0">Fast-Generalist</text>
+<text x="380" y="424" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.600</text>
+<text x="520" y="424" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.175</text>
+<text x="660" y="424" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.085</text>
+<text x="810" y="424" font-size="12" font-weight="700" fill="#6b7280" text-anchor="start" opacity="1.0">0.860</text>
+<text x="80" y="446" font-size="12" font-weight="700" fill="#f85149" text-anchor="start" opacity="1.0">Claimed-Expert（虚报型）</text>
+<text x="380" y="446" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.600</text>
+<text x="520" y="446" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.075</text>
+<text x="660" y="446" font-size="12" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">0.087</text>
+<text x="810" y="446" font-size="12" font-weight="700" fill="#f85149" text-anchor="start" opacity="1.0">0.762</text>
+<text x="60" y="478" font-size="11.5" font-weight="400" fill="#6b7280" text-anchor="start" opacity="1.0">注意第一列：三个智能体的能力项均为 0.600 —— 当能力相同时该项不起区分作用，这正是「仅能力匹配」策略失效的原因。</text>
+</svg>
