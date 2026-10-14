@@ -183,8 +183,11 @@ git push                                    # 推到 GitHub
 
 | 现象 | 原因 | 怎么办 |
 |---|---|---|
+| `fatal: not a git repository` | **终端站错文件夹** | `cd C:\项目\projects\agenttrust`，或用 `git -C 路径 命令` |
+| `Failed to connect to github.com:443` | **git 没走代理** | 见下面第九节（本项目已遇到并解决） |
+| `Repository not found` | 仓库地址拼错，或是私有仓库 | 用浏览器打开地址确认它是否存在 |
 | `please tell me who you are` | 没配身份 | 回到第二节步骤 1 |
-| `failed to push some refs` | GitHub 仓库不是空的 | 建仓库时不要勾 README/gitignore |
+| `failed to push some refs` | 两边历史对不上（远程有自动生成的 README） | 见第十节，本项目已遇到并解决 |
 | 要求输入密码但输不对 | GitHub 不用密码了 | 要生成 Personal Access Token |
 | 中文文件名是乱码 | 没设 quotepath | 回到第二节步骤 2 |
 | 传上去发现 `.venv` 也在 | `.gitignore` 没生效 | 执行 `git rm -r --cached .venv` 再提交 |
@@ -192,15 +195,152 @@ git push                                    # 推到 GitHub
 
 ---
 
-# 八、当前状态（我已完成的部分）
+# 八、⚠️ 代理问题（本项目实际遇到过）
+
+## 症状
+
+```
+fatal: unable to access 'https://github.com/...': 
+Failed to connect to github.com:443 after 21120 ms: Could not connect to server
+```
+
+但浏览器打开 GitHub 是正常的。
+
+## 原因
+
+你的电脑上跑着一个**本地代理**（通常是科学上网工具）。
+浏览器和 PowerShell **会自动使用系统代理**，但 **git 不会** ——
+所以 git 在"直连"，连不上。
+
+## 怎么诊断
+
+```powershell
+# 看系统代理地址
+Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" |
+    Select-Object ProxyEnable, ProxyServer
+```
+
+会看到类似 `ProxyServer : http://127.0.0.1:65532` —— **记住这个端口号**。
+
+## 怎么修
+
+把上面查到的地址填进去：
+
+```powershell
+git config --global http.proxy "http://127.0.0.1:65532"
+git config --global https.proxy "http://127.0.0.1:65532"
+```
+
+然后测试：
+
+```powershell
+git ls-remote origin
+```
+
+## ⚠️ 重要提醒
+
+| 事项 | 说明 |
+|---|---|
+| **端口号可能变** | 代理软件重启后端口可能变化。如果又连不上，重新查一次 |
+| **这是本机设置** | 只影响你这台电脑，**不会同步给队友** |
+| **队友怎么办** | 队友如果不翻墙，通常**不需要**配代理，直接就能用 |
+
+### 如果哪天要取消代理
+
+```powershell
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
+---
+
+# 九、⚠️ 远程仓库已有内容怎么办（本项目实际遇到过）
+
+## 症状
+
+```
+! [rejected]  main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/...'
+hint: Updates were rejected because the tip of your current branch is behind
+```
+
+## 原因
+
+建 GitHub 仓库时勾了 **`Add a README file`**，
+于是远程有了一个自动生成的 `README.md` 提交，和本地的历史"对不上" ——
+git 不知道该怎么合并两条无关的历史。
+
+## 先确认覆盖是否安全（必做！）
+
+```powershell
+git fetch origin
+git ls-tree -r --name-only origin/main
+```
+
+| 结果 | 说明 |
+|---|---|
+| 只有 `README.md` | ✅ **安全**，那是自动生成的，可以用 `--force` 覆盖 |
+| 有你自己写的东西 | ❌ **不要用 `--force`**！先告诉我，我帮你合并 |
+
+## 修法
+
+```powershell
+git push --force -u origin main
+```
+
+## ⚠️ `--force` 是危险命令
+
+**它会不可恢复地覆盖远程内容。** 唯一安全的场景是上面说的
+"远程只有自动生成的文件、没有任何人的劳动成果"。
+
+**确认过安全再用，不要养成习惯。** 以后正常推送就三行：
+
+```powershell
+git add -A
+git commit -m "说明"
+git push
+```
+
+---
+
+# 十、当前状态
 
 | 步骤 | 状态 |
 |---|---|
-| `git init` 建立本地仓库 | ✅ 已完成 |
-| 修正 `.gitignore` | ✅ 已完成（实测排除 `.venv`） |
-| `git add -A` 加入待提交区 | ✅ 已完成（26 个文件） |
-| `core.quotepath false` | ✅ 已完成 |
-| 配置 git 身份 | ⬜ **需要你来做**（我无法知道你的名字和邮箱） |
-| 提交 commit | ⬜ 等你配完身份 |
-| 建 GitHub 仓库 | ⬜ 需要你有 GitHub 账号 |
-| push 推送 | ⬜ 等前面都完成 |
+| `git init` 建立本地仓库 | ✅ 完成 |
+| 修正 `.gitignore`（实测排除 `.venv`） | ✅ 完成 |
+| 配置 git 身份（黄钰洲 / 3211599714@qq.com） | ✅ 完成 |
+| 提交 commit | ✅ 完成（`4dcb8c7`） |
+| 建 GitHub 仓库 | ✅ 完成 |
+| 配置代理让 git 能连上 | ✅ 完成 |
+| push 推送 | ✅ **完成，本地与远程完全一致** |
+| 端到端验证：模拟队友 clone → 装依赖 → 跑测试 | ✅ **204 passed** |
+
+**仓库地址**：https://github.com/yuzhouhuang-ops/AgentTurst
+
+> **注意仓库名的拼写**：是 `AgentTurst`，不是 `AgentTrust`（`u` 和 `r` 反了）。
+> 想改的话在仓库 `Settings` 页面改，改完记得本地也要同步：
+> ```powershell
+> git remote set-url origin https://github.com/yuzhouhuang-ops/新名字.git
+> ```
+
+---
+
+# 十一、日常使用速查（以后每次改代码）
+
+```powershell
+# 0. 永远先确认位置
+pwd                                    # 应该是 C:\项目\projects\agenttrust
+
+# 1. 看改了哪些文件
+git status
+
+# 2. 提交
+git add -A
+git commit -m "说明这次改了什么"
+
+# 3. 推送
+git push
+```
+
+**习惯建议**：每完成一件小事就提交一次，别攒一大堆。这样出问题能回退，队友也能看清进展。
