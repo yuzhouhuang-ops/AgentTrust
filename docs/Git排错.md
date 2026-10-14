@@ -38,49 +38,90 @@ git -C C:\项目\projects\agenttrust status
 
 ## 问题 2：`Failed to connect to github.com:443`
 
-**原因**：git 没走代理。
+### 两种情况，先判断是哪一种
 
-你电脑上跑着本地代理，**浏览器和 PowerShell 会自动用它，但 git 不会** ——
-所以 git 在直连，连不上。
+| 报错里的关键词 | 情况 |
+|---|---|
+| `after 21120 ms`（超时很久） | **没走代理**，在直连但连不上 |
+| `over proxy 127.0.0.1 after 2072 ms` | **配置了代理但代理是死的** |
 
-### 诊断
+### 情况 A：没走代理（第一次遇到的那次）
+
+你电脑上跑着本地代理，**浏览器和 PowerShell 会自动用它，但 git 不会**。
+
+**诊断**：
 
 ```powershell
 Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" |
     Select-Object ProxyEnable, ProxyServer
 ```
 
-会看到类似 `ProxyServer : http://127.0.0.1:65532`，**记住端口号**。
-
-### 修复
-
-把上面查到的地址填进去：
+如果 `ProxyEnable = 1`，把这个地址填给 git：
 
 ```powershell
 git config --global http.proxy "http://127.0.0.1:65532"
 git config --global https.proxy "http://127.0.0.1:65532"
 ```
 
-### 验证
+### 情况 B：代理配置失效了（本项目实际遇到）
+
+**代理软件关掉之后，git 里那条配置就成了死地址** ——
+明明直连能用，git 却一直去敲一个没人应答的端口。
+
+**诊断**：
 
 ```powershell
-git ls-remote origin
+# 先看系统代理是不是关了
+Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" | Select-Object ProxyEnable
+
+# 再看 git 配的端口还在不在监听
+Get-NetTCPConnection -LocalPort 65532 -State Listen -ErrorAction SilentlyContinue
 ```
 
-### ⚠️ 注意事项
-
-| 事项 | 说明 |
-|---|---|
-| **端口号会变** | 代理软件重启后端口可能变。又连不上就重新查一次 |
-| **只是本机设置** | 不会同步给队友 |
-| **队友通常不用配** | 队友不翻墙的话直接就能用 |
-
-取消代理：
+**如果 `ProxyEnable = 0` 或端口没在监听 → 直接把 git 的代理配置删掉**：
 
 ```powershell
 git config --global --unset http.proxy
 git config --global --unset https.proxy
 ```
+
+### 关键技巧：不改配置也能先测一下
+
+```powershell
+git -c http.proxy= -c https.proxy= ls-remote origin
+```
+
+这条命令**临时**不使用代理。如果它成功，就说明应该删掉代理配置。
+
+### ⚠️ 注意事项
+
+| 事项 | 说明 |
+|---|---|
+| **端口号会变** | 代理软件重启后端口可能变化 |
+| **代理关掉后要清理** | 否则 git 会去连一个死端口，**比不配置还慢** |
+| **只是本机设置** | 不会同步给队友 |
+| **队友通常不用配** | 队友不翻墙的话直接就能用 |
+
+---
+
+## 问题 2.5：提交成功了但推送失败
+
+**现象**：`git commit` 成功，`git push` 报连接错误。
+
+**这是正常的** —— commit 是**本地操作**，不需要网络；
+push 才需要联网。
+
+**所以本地代码不会丢**。等网络恢复或代理配好后，直接 `git push` 即可。
+
+**判断当前状态**：
+
+```powershell
+git log --oneline -3              # 本地有哪些提交
+git rev-parse HEAD                # 本地最新提交
+git rev-parse origin/main         # 远程最新提交（需要能联网）
+```
+
+两个哈希不一样就说明有本地提交还没推上去。
 
 ---
 
