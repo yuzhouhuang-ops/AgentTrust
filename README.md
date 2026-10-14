@@ -5,19 +5,43 @@
 核心思路：让多个模拟智能体登记自己的能力，系统根据**能力匹配度**、**基于历史实际结果计算的可信度**、
 **响应延迟**三方面综合排序。重点验证系统**不会盲信智能体的自我宣称成功率**。
 
+## 📖 文档导览
+
+**第一次接触本项目，按这个顺序看：**
+
+| # | 文档 | 内容 | 给谁看 |
+|---|---|---|---|
+| 1 | [`PROJECT.md`](PROJECT.md) | 项目背景、目标、团队约束、必须遵守的规则 | **所有人先看这个** |
+| 2 | [`LEARN.md`](LEARN.md) | 项目在干什么、核心公式、实验结论、**答辩预演** | 新成员 |
+| 3 | [`代码导读1_scoring.md`](代码导读1_scoring.md) | 核心算法逐段讲解 + 手算验证 | 要读懂代码的人 |
+| 4 | [`调研/参考资源与UCB实验.md`](调研/参考资源与UCB实验.md) | GitHub 参考资源、许可证说明、UCB 对照实验 | 做调研/写报告的人 |
+| 5 | [`docs/学习路线.md`](docs/学习路线.md) | 需要掌握什么技能、任务大纲、团队分工 | 规划时间的人 |
+| 6 | [`docs/操作清单.md`](docs/操作清单.md) | 一步步的操作步骤（含预期结果和报错处理） | 动手操作时对着看 |
+| 7 | [`docs/Git排错.md`](docs/Git排错.md) | Git 常见报错处理 | 提交代码遇到问题时 |
+
+> ⚠️ **常见误解提醒**：`/demo/reset` 加载的演示战绩是**硬编码**的，只用于接口演示。
+> **只有 `run_experiment.py` 跑出来的才是真实实验数据**，两者不要混用。
+
+---
+
 ## 项目结构
 
 ```
 agenttrust/
-├── app/
-│   └── main.py              # 全部后端代码（FastAPI 应用）
-├── tests/
-│   ├── conftest.py          # 让测试能找到 app/main.py
-│   ├── __init__.py
-│   └── test_agenttrust.py   # 49 个自动化测试
-├── requirements.txt         # 依赖清单
-├── pyproject.toml           # pytest 配置
-└── README.md
+├── app/                          # 核心代码（共 1427 行）
+│   ├── main.py                   # FastAPI 服务：接口层
+│   ├── scoring.py                # 评分逻辑：可信度/能力匹配/延迟（150 行，最核心）
+│   ├── simulator.py              # 模拟任务执行器：结果由概率真实产生
+│   ├── strategies.py             # 三种调度策略
+│   └── experiment.py             # 对照实验框架
+├── tests/                        # 204 个自动化测试
+├── results/                      # 实验原始数据（CSV + JSON）
+├── 调研/                          # 参考资源调研与探索性实验
+├── docs/                         # 内部工作文档
+├── run_experiment.py             # 实验入口：一条命令跑出结果
+├── requirements.txt              # 依赖清单
+├── pyproject.toml                # pytest 配置
+└── README.md                     # 本文件
 ```
 
 ## Windows PowerShell 启动
