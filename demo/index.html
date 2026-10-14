@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentTrust — 抗欺骗调度演示</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    background: #0f1420;
+    color: #e6edf3;
+    padding: 24px;
+    line-height: 1.6;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  /* ---------- 标题 ---------- */
+  header { margin-bottom: 24px; }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: .5px; }
+  .sub { color: #8b98a9; font-size: 14px; margin-top: 6px; }
+
+  /* ---------- 控制栏 ---------- */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    padding: 16px; margin-bottom: 20px;
+    background: #171d2b; border: 1px solid #232c3d; border-radius: 10px;
+  }
+  button {
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    padding: 9px 16px; border-radius: 7px;
+    border: 1px solid #2d3a52; background: #1e2637; color: #d5dee8;
+    cursor: pointer; transition: all .15s;
+  }
+  button:hover:not(:disabled) { background: #27324a; border-color: #3d4d6d; transform: translateY(-1px); }
+  button:active:not(:disabled) { transform: translateY(0); }
+  button:disabled { opacity: .35; cursor: not-allowed; }
+  button.primary { background: #1f6feb; border-color: #388bfd; color: #fff; }
+  button.primary:hover:not(:disabled) { background: #2b7fff; }
+  button.danger { background: #3d1d22; border-color: #6b2b33; color: #ff9ba6; }
+  button.danger:hover:not(:disabled) { background: #4d232a; }
+  button.auto-on { background: #b8860b; border-color: #daa520; color: #fff; }
+
+  /* ---------- 提示区 ---------- */
+  .current-task {
+    padding: 12px 16px; margin-bottom: 18px;
+    background: #12203a; border-left: 3px solid #1f6feb; border-radius: 6px;
+    font-size: 14px;
+  }
+  .current-task b { color: #79c0ff; }
+
+  /* ---------- 智能体卡片 ---------- */
+  .agents { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+
+  .agent {
+    background: #171d2b; border: 1px solid #232c3d; border-radius: 10px;
+    padding: 16px 18px; position: relative; overflow: hidden;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .agent.chosen {
+    border-color: #daa520;
+    box-shadow: 0 0 0 1px #daa520, 0 0 24px rgba(218,165,32,.22);
+  }
+  .agent.chosen::after {
+    content: "本次选中"; position: absolute; top: 0; right: 0;
+    background: #daa520; color: #1a1a1a;
+    font-size: 11px; font-weight: 700; padding: 3px 12px;
+    border-bottom-left-radius: 8px;
+  }
+  .agent.loser { opacity: .55; }
+  .agent.deceptive { border-left: 3px solid #f85149; }
+
+  .agent-head {
+    display: flex; align-items: baseline; gap: 12px;
+    flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .agent-name { font-size: 17px; font-weight: 600; }
+  .badge {
+    font-size: 11px; padding: 2px 9px; border-radius: 20px; font-weight: 600;
+  }
+  .badge.liar { background: #3d1d22; color: #ff9ba6; border: 1px solid #6b2b33; }
+  .badge.note { background: #1e2637; color: #8b98a9; border: 1px solid #2d3a52; }
+  .claim { color: #8b98a9; font-size: 13px; margin-left: auto; }
+  .claim b { color: #d5dee8; }
+  .claim .warn { color: #ff9ba6; }
+
+  /* 可信度条 */
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .bar-label { font-size: 12px; color: #8b98a9; width: 52px; flex-shrink: 0; }
+  .bar-track {
+    flex: 1; height: 20px; background: #0d1220;
+    border-radius: 5px; overflow: hidden; position: relative;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 5px;
+    transition: width .5s cubic-bezier(.4,0,.2,1), background .3s;
+  }
+  .bar-val {
+    font-variant-numeric: tabular-nums; font-weight: 700;
+    font-size: 15px; width: 58px; text-align: right; flex-shrink: 0;
+  }
+
+  .stats { display: flex; gap: 20px; font-size: 13px; color: #8b98a9; flex-wrap: wrap; }
+  .stats b { color: #d5dee8; font-variant-numeric: tabular-nums; }
+
+  /* ---------- 日志 ---------- */
+  .log-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .log-head h2 { font-size: 15px; font-weight: 600; color: #8b98a9; }
+  .log {
+    background: #0d1220; border: 1px solid #232c3d; border-radius: 10px;
+    padding: 12px 16px; height: 260px; overflow-y: auto;
+    font-size: 13px; font-family: Consolas, "Courier New", monospace;
+  }
+  .log-line { padding: 4px 0; border-bottom: 1px solid #161d2b; display: flex; gap: 10px; }
+  .log-line:last-child { border-bottom: none; }
+  .log-idx { color: #4d5b70; flex-shrink: 0; width: 34px; }
+  .log-ok { color: #3fb950; }
+  .log-fail { color: #f85149; }
+  .log-info { color: #79c0ff; }
+  .log-warn { color: #daa520; }
+  .log-text { flex: 1; }
+
+  /* ---------- 说明 ---------- */
+  footer {
+    margin-top: 26px; padding-top: 18px; border-top: 1px solid #232c3d;
+    font-size: 12px; color: #6b7a8f; line-height: 1.9;
+  }
+  footer code {
+    background: #1e2637; padding: 1px 6px; border-radius: 4px;
+    color: #a5b3c4; font-family: Consolas, monospace;
+  }
+  .formula {
+    background: #12203a; border-left: 3px solid #1f6feb;
+    padding: 10px 14px; border-radius: 6px; margin: 10px 0;
+    font-family: Consolas, monospace; font-size: 13px; color: #a5d6ff;
+  }
+  .demo-flag {
+    display: inline-block; background: #3d2f10; color: #e3b341;
+    border: 1px solid #6b5518; font-size: 11px; font-weight: 700;
+    padding: 2px 9px; border-radius: 20px; margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>AgentTrust — 抗欺骗调度演示</h1>
+    <div class="sub">
+      系统不看智能体自己宣称的成功率，只认它过去真实干成过几次
+      <span class="demo-flag">浏览器内模拟</span>
+    </div>
+  </header>
+
+  <!-- 控制栏 -->
+  <div class="controls">
+    <button class="primary" id="btn-task">① 派人做任务</button>
+    <button class="danger"  id="btn-fail">让它失败</button>
+    <button class="primary" id="btn-success">让它成功</button>
+    <button id="btn-auto">▶ 连续跑 20 轮</button>
+    <button id="btn-reset">↻ 重置</button>
+  </div>
+
+  <div class="current-task" id="task-line">
+    点「派人做任务」开始演示 —— 系统会按综合分挑选最合适的智能体。
+  </div>
+
+  <!-- 智能体列表 -->
+  <div class="agents" id="agents"></div>
+
+  <!-- 日志 -->
+  <div class="log-head">
+    <h2>调度日志</h2>
+    <span style="font-size:12px;color:#6b7a8f" id="round-counter">已完成 0 次调度</span>
+  </div>
+  <div class="log" id="log">
+    <div class="log-line"><span class="log-idx">—</span><span class="log-text log-info">等待操作…</span></div>
+  </div>
+
+  <footer>
+    <div><b>综合分公式</b>（与项目 <code>app/scoring.py</code> 完全一致）</div>
+    <div class="formula">
+      综合分 = 0.60 × 能力匹配度 + 0.30 × 可信度 + 0.10 × 延迟分<br>
+      可信度 = (成功次数 + 2) ÷ (成功次数 + 失败次数 + 4)<br>
+      延迟分 = 1000 ÷ (1000 + 延迟毫秒)
+    </div>
+    <div>
+      ⚠️ 本页在浏览器里模拟运行，智能体的成功/失败由概率随机产生（与
+      <code>app/simulator.py</code> 同一个模型），<b>不连接后端服务</b>，
+      以保证演示不依赖网络与环境。
+      真实实验数据请运行 <code>run_experiment.py</code>。
+    </div>
+    <div style="margin-top:8px">
+      <b>演示要点</b>：Claimed-Expert 自称成功率 99%、延迟最低（表面最有吸引力），
+      但真实成功率只有 15%。观察它的可信度条如何变化。
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// =====================================================================
+// AgentTrust 前端演示
+//
+// 设计说明：
+//   公式与 app/scoring.py 保持一致，随机模型与 app/simulator.py 保持一致。
+//   刻意不依赖后端服务 —— 演示时不需要启动 uvicorn，双击就能打开。
+//   所有计算都在本地完成，因此跑几百轮也是瞬间的事。
+// =====================================================================
+
+// ---------- 与 app/scoring.py 一致的常数 ----------
+const PRIOR_S = 2.0;              // 平滑常数：先验成功次数
+const PRIOR_F = 2.0;              // 平滑常数：先验失败次数
+const W_CAPABILITY = 0.60;
+const W_TRUST      = 0.30;
+const W_LATENCY    = 0.10;
+const LATENCY_SCALE = 1000.0;
+
+// ---------- 与 app/scoring.py 一致的公式 ----------
+function trustScore(s, f) {
+  return (s + PRIOR_S) / (s + f + PRIOR_S + PRIOR_F);
+}
+
+function matchScore(offered, required) {
+  const req = new Set(required.map(x => x.trim().toLowerCase()).filter(Boolean));
+  if (req.size === 0) return 0;
+  const off = new Set(offered.map(x => x.trim().toLowerCase()).filter(Boolean));
+  let hit = 0;
+  for (const r of req) if (off.has(r)) hit++;
+  return hit / req.size;
+}
+
+function latencyScore(ms) {
+  return LATENCY_SCALE / (LATENCY_SCALE + ms);
+}
+
+function totalScore(agent, required) {
+  return W_CAPABILITY * matchScore(agent.capabilities, required)
+       + W_TRUST      * trustScore(agent.successes, agent.failures)
+       + W_LATENCY    * latencyScore(agent.latencyMs);
+}
+
+// ---------- 与 app/simulator.py 一致的智能体定义 ----------
+function makeAgents() {
+  return [
+    {
+      name: "Reliable-Researcher",
+      capabilities: ["research"],
+      claimed: 0.82,
+      trueRate: 0.82,          // 诚实：宣称 = 真实
+      baseLatency: 430,
+      latencyMs: 430,
+      note: "可靠型：能力窄但表现扎实",
+      successes: 0, failures: 0, latencySum: 0, picks: 0, wins: 0,
+      deceptive: false
+    },
+    {
+      name: "Fast-Generalist",
+      capabilities: ["research", "summarization"],
+      claimed: 0.75,
+      trueRate: 0.75,
+      baseLatency: 180,
+      latencyMs: 180,
+      note: "快速通用型：能力强速度快，可靠性中等",
+      successes: 0, failures: 0, latencySum: 0, picks: 0, wins: 0,
+      deceptive: false
+    },
+    {
+      name: "Claimed-Expert",
+      capabilities: ["research", "translation", "coding"],
+      claimed: 0.99,           // 自称 99%
+      trueRate: 0.15,          // 实际只有 15%
+      baseLatency: 150,        // 延迟还最低
+      latencyMs: 150,
+      note: "虚报型：宣称 0.99 实际 0.15",
+      successes: 0, failures: 0, latencySum: 0, picks: 0, wins: 0,
+      deceptive: true
+    }
+  ];
+}
+
+const REQUIRED = ["research"];    // 本次演示的任务需求能力
+
+// ---------- 状态 ----------
+let agents = makeAgents();
+let round = 0;
+let lastChosen = null;
+let autoTimer = null;
+let logLines = [];
+
+// ---------- 渲染 ----------
+const elAgents = document.getElementById("agents");
+const elLog = document.getElementById("log");
+const elTaskLine = document.getElementById("task-line");
+const elCounter = document.getElementById("round-counter");
+
+function trustColor(v) {
+  if (v >= 0.70) return "linear-gradient(90deg,#238636,#3fb950)";
+  if (v >= 0.45) return "linear-gradient(90deg,#9e6a03,#d29922)";
+  return "linear-gradient(90deg,#8b1f28,#f85149)";
+}
+
+function renderAgents() {
+  elAgents.innerHTML = agents.map(a => {
+    const trust = trustScore(a.successes, a.failures);
+    const isChosen = lastChosen === a.name;
+    const cls = ["agent"];
+    if (isChosen) cls.push("chosen");
+    if (a.deceptive) cls.push("deceptive");
+
+    const gap = a.claimed - a.trueRate;
+    return `
+      <div class="${cls.join(" ")}">
+        <div class="agent-head">
+          <span class="agent-name">${a.name}</span>
+          ${a.deceptive ? '<span class="badge liar">⚠ 虚报型</span>' : ""}
+          <span class="badge note">${a.note}</span>
+          <span class="claim">自称成功率
+            <b class="${a.deceptive ? "warn" : ""}">${(a.claimed * 100).toFixed(0)}%</b>
+          </span>
+        </div>
+
+        <div class="bar-row">
+          <span class="bar-label">可信度</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${(trust * 100).toFixed(1)}%;background:${trustColor(trust)}"></div>
+          </div>
+          <span class="bar-val">${trust.toFixed(3)}</span>
+        </div>
+
+        <div class="stats">
+          <span>战绩 <b>${a.successes} 胜 ${a.failures} 负</b></span>
+          <span>实测成功率 <b>${a.picks ? (a.wins / a.picks * 100).toFixed(1) + "%" : "—"}</b></span>
+          <span>实测平均延迟 <b>${a.picks ? Math.round(a.latencySum / a.picks) + "ms" : "—"}</b></span>
+          <span>被选中 <b>${a.picks} 次</b></span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderLog() {
+  if (logLines.length === 0) {
+    elLog.innerHTML = '<div class="log-line"><span class="log-idx">—</span><span class="log-text log-info">等待操作…</span></div>';
+    return;
+  }
+  elLog.innerHTML = logLines.map(l =>
+    `<div class="log-line">
+       <span class="log-idx">${l.idx}</span>
+       <span class="log-text ${l.cls}">${l.text}</span>
+     </div>`
+  ).join("");
+  elLog.scrollTop = elLog.scrollHeight;
+}
+
+function addLog(text, cls) {
+  logLines.push({ idx: String(round).padStart(3, "0"), text, cls });
+  if (logLines.length > 200) logLines = logLines.slice(-200);
+  renderLog();
+}
+
+function render() {
+  renderAgents();
+  renderLog();
+  elCounter.textContent = `已完成 ${round} 次调度`;
+}
+
+// ---------- 核心：按综合分挑选 ----------
+function pickAgent() {
+  const scored = agents
+    .filter(a => matchScore(a.capabilities, REQUIRED) > 0)
+    .map(a => ({ agent: a, total: totalScore(a, REQUIRED) }));
+  if (scored.length === 0) return null;
+  scored.sort((x, y) => y.total - x.total);
+  return { agent: scored[0].agent, ranking: scored };
+}
+
+// ---------- 执行一次任务（结果由概率产生）----------
+function runTask(forceResult) {
+  const picked = pickAgent();
+  if (!picked) { addLog("没有智能体能胜任该任务", "log-warn"); return; }
+
+  const a = picked.agent;
+  const before = trustScore(a.successes, a.failures);
+
+  // 延迟抖动（±20%），与 simulator.py 一致
+  const lat = Math.max(1, a.baseLatency * (0.8 + Math.random() * 0.4));
+
+  // 成败由真实成功率决定；forceResult 用于演示时手动指定
+  const success = (forceResult === undefined)
+    ? Math.random() < a.trueRate
+    : forceResult;
+
+  if (success) { a.successes++; a.wins++; } else { a.failures++; }
+  a.latencySum += lat;
+  a.picks++;
+  a.latencyMs = a.latencySum / a.picks;
+
+  const after = trustScore(a.successes, a.failures);
+  round++;
+  lastChosen = a.name;
+
+  const arrow = after > before ? "▲" : (after < before ? "▼" : "—");
+  const arrowCls = after >= before ? "log-ok" : "log-fail";
+  const resTxt = success ? "成功" : "失败";
+
+  addLog(
+    `按综合分选中 <b>${a.name}</b>（总分 ${picked.ranking[0].total.toFixed(4)}）` +
+    ` → 任务${resTxt} <span class="${arrowCls}">${arrow} 可信度 ` +
+    `${before.toFixed(3)} → ${after.toFixed(3)}</span>` ,
+    success ? "log-ok" : "log-fail"
+  );
+
+  const runnerUp = picked.ranking[1];
+  elTaskLine.innerHTML = success
+    ? `最新调度：任务 <b>${REQUIRED.join(" + ")}</b> 由 <b>${a.name}</b> 承接 —— <b style="color:#3fb950">成功</b>`
+      + (runnerUp ? `　次选：${runnerUp.agent.name}（${runnerUp.total.toFixed(4)}）` : "")
+    : `最新调度：任务 <b>${REQUIRED.join(" + ")}</b> 由 <b>${a.name}</b> 承接 —— <b style="color:#f85149">失败</b>`
+      + (runnerUp ? `　次选：${runnerUp.agent.name}（${runnerUp.total.toFixed(4)}）` : "");
+
+  render();
+}
+
+// ---------- 按钮 ----------
+document.getElementById("btn-task").onclick = () => runTask();
+document.getElementById("btn-fail").onclick = () => runTask(false);
+document.getElementById("btn-success").onclick = () => runTask(true);
+
+document.getElementById("btn-reset").onclick = () => {
+  stopAuto();
+  agents = makeAgents();
+  round = 0; lastChosen = null; logLines = [];
+  elTaskLine.innerHTML = '已重置。点「派人做任务」开始演示 —— 系统会按综合分挑选最合适的智能体。';
+  addLog("演示数据已重置：三个智能体都回到 0 胜 0 负，可信度均为 0.500", "log-info");
+  render();
+};
+
+function stopAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  const b = document.getElementById("btn-auto");
+  b.textContent = "▶ 连续跑 20 轮";
+  b.classList.remove("auto-on");
+}
+
+document.getElementById("btn-auto").onclick = function () {
+  if (autoTimer) { stopAuto(); addLog("已暂停自动运行", "log-info"); return; }
+
+  const b = this;
+  b.textContent = "⏸ 暂停";
+  b.classList.add("auto-on");
+  addLog("开始连续运行 20 轮（结果由概率产生）", "log-info");
+
+  let n = 0;
+  autoTimer = setInterval(() => {
+    runTask();
+    if (++n >= 20) { stopAuto(); addLog("20 轮跑完", "log-info"); }
+  }, 260);
+};
+
+// ---------- 启动 ----------
+addLog("演示就绪。三个智能体均为 0 胜 0 负，可信度 0.500（冷启动）", "log-info");
+addLog("提示：Claimed-Expert 自称 99%、延迟最低，但真实成功率只有 15%", "log-warn");
+render();
+</script>
+</body>
+</html>
