@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="480" viewBox="0 0 860 480" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+<rect width="860" height="480" fill="#ffffff"/>
+<text x="90" y="38" font-size="21" font-weight="700" fill="#1a1a1a">三种调度策略效果对比</text>
+<text x="90" y="62" font-size="13" fill="#6b7280">5 次独立试验 × 100 轮 × 3 种策略 = 1500 次调度决策 ｜ 固定随机种子 42</text>
+<line x1="90" y1="370.0" x2="820" y2="370.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="375.0" font-size="13" text-anchor="end" fill="#6b7280">0%</text>
+<line x1="90" y1="314.0" x2="820" y2="314.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="319.0" font-size="13" text-anchor="end" fill="#6b7280">20%</text>
+<line x1="90" y1="258.0" x2="820" y2="258.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="263.0" font-size="13" text-anchor="end" fill="#6b7280">40%</text>
+<line x1="90" y1="202.0" x2="820" y2="202.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="207.0" font-size="13" text-anchor="end" fill="#6b7280">60%</text>
+<line x1="90" y1="146.0" x2="820" y2="146.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="151.0" font-size="13" text-anchor="end" fill="#6b7280">80%</text>
+<line x1="90" y1="90.0" x2="820" y2="90.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="78" y="95.0" font-size="13" text-anchor="end" fill="#6b7280">100%</text>
+<rect x="490" y="69" width="12" height="12" fill="#1f6feb" rx="2"/>
+<text x="508" y="79" font-size="12" fill="#6b7280">任务成功率（越高越好）</text>
+<rect x="660" y="69" width="12" height="12" fill="#f85149" rx="2"/>
+<text x="678" y="79" font-size="12" fill="#6b7280">欺骗智能体被选中率（越低越好）</text>
+<rect x="132.7" y="324.6" width="73.0" height="45.4" fill="#1f6feb" rx="3"/>
+<text x="169.2" y="317.6" font-size="14" font-weight="700" text-anchor="middle" fill="#1f6feb">16.2%</text>
+<rect x="217.7" y="90.0" width="73.0" height="280.0" fill="#f85149" rx="3"/>
+<text x="254.2" y="83.0" font-size="14" font-weight="700" text-anchor="middle" fill="#f85149">100.0%</text>
+<text x="211.7" y="396" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">仅能力匹配</text>
+<rect x="376.0" y="206.5" width="73.0" height="163.5" fill="#1f6feb" rx="3"/>
+<text x="412.5" y="199.5" font-size="14" font-weight="700" text-anchor="middle" fill="#1f6feb">58.4%</text>
+<rect x="461.0" y="288.2" width="73.0" height="81.8" fill="#f85149" rx="3"/>
+<text x="497.5" y="281.2" font-size="14" font-weight="700" text-anchor="middle" fill="#f85149">29.2%</text>
+<text x="455.0" y="396" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">随机选择</text>
+<rect x="619.3" y="150.5" width="73.0" height="219.5" fill="#1f6feb" rx="3"/>
+<text x="655.8" y="143.5" font-size="14" font-weight="700" text-anchor="middle" fill="#1f6feb">78.4%</text>
+<rect x="704.3" y="366.6" width="73.0" height="3.4" fill="#f85149" rx="3"/>
+<text x="740.8" y="359.6" font-size="14" font-weight="700" text-anchor="middle" fill="#f85149">1.2%</text>
+<text x="698.3" y="396" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1a1a">可信度感知</text>
+<text x="698.3" y="414" font-size="12" font-weight="400" text-anchor="middle" fill="#6b7280">（本方案）</text>
+<line x1="90" y1="370" x2="820" y2="370" stroke="#9ca3af" stroke-width="1.5"/>
+<line x1="90" y1="90" x2="90" y2="370" stroke="#9ca3af" stroke-width="1.5"/>
+<text x="90" y="450" font-size="13" fill="#1a1a1a">关键发现：「仅能力匹配」比「随机选择」还差 4 倍 —— 能力项恒为 1.0 失去区分作用后退化为「只看延迟」，而欺骗智能体延迟最低。</text>
+</svg>
